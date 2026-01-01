@@ -8,6 +8,12 @@ interface BackgroundProps {
 
 const Background: React.FC<BackgroundProps> = ({ theme }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const themeRef = useRef(theme);
+
+  // Sync theme ref for the animation loop without triggering re-render of effect
+  useEffect(() => {
+    themeRef.current = theme;
+  }, [theme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -29,8 +35,6 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
     window.addEventListener('resize', resize);
     resize();
 
-    const isDark = theme === 'dark';
-
     // --- Particle Systems ---
 
     // 1. Stars (High Frequencies)
@@ -42,7 +46,6 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
       baseAlpha: number;
       currentAlpha: number;
       velocity: number;
-      color: string;
 
       constructor() {
         this.x = Math.random() * width;
@@ -52,28 +55,28 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
         this.baseAlpha = Math.random() * 0.3 + 0.1;
         this.currentAlpha = this.baseAlpha;
         this.velocity = Math.random() * 0.05 + 0.02;
-        this.color = isDark ? '255, 255, 255' : '100, 116, 139'; // White vs Slate-500
       }
 
       update(energy: number) {
-        // High frequency reaction: Sparkle (Alpha) and slight Size increase
         this.y -= this.velocity;
         if (this.y < 0) this.y = height;
 
-        const normalizedEnergy = Math.max(0, (energy - 20) / 255); // Threshold noise
+        const normalizedEnergy = Math.max(0, (energy - 20) / 255); 
         
         if (normalizedEnergy > 0) {
             this.currentAlpha = Math.min(1, this.baseAlpha + (normalizedEnergy * 1.5));
             this.size = this.baseSize + (normalizedEnergy * 1.5);
         } else {
-            // Decay
             this.currentAlpha += (this.baseAlpha - this.currentAlpha) * 0.1;
             this.size += (this.baseSize - this.size) * 0.1;
         }
       }
 
       draw() {
-        ctx!.fillStyle = `rgba(${this.color}, ${this.currentAlpha})`;
+        const isDark = themeRef.current === 'dark';
+        const color = isDark ? '255, 255, 255' : '71, 85, 105'; 
+        
+        ctx!.fillStyle = `rgba(${color}, ${this.currentAlpha})`;
         ctx!.beginPath();
         ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx!.fill();
@@ -85,7 +88,7 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
       x: number;
       y: number;
       size: number;
-      color: string;
+      colorIndex: number;
       rotation: number;
       rotationSpeed: number;
       driftX: number;
@@ -95,10 +98,7 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
         this.size = Math.random() * 4 + 2;
-        const darkColors = ['#fcd34d', '#e879f9', '#818cf8']; // Gold, Pink, Indigo
-        const lightColors = ['#f59e0b', '#d946ef', '#6366f1']; // Darker variants for light mode
-        const colors = isDark ? darkColors : lightColors;
-        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.colorIndex = Math.floor(Math.random() * 4);
         this.rotation = Math.random() * Math.PI * 2;
         this.rotationSpeed = (Math.random() - 0.5) * 0.02;
         this.driftX = (Math.random() - 0.5) * 0.5;
@@ -106,9 +106,7 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
       }
 
       update(energy: number) {
-        // Mid frequency reaction: Movement speed and Rotation
         const normalizedEnergy = Math.max(0, (energy - 30) / 255);
-        
         const speedMultiplier = 1 + (normalizedEnergy * 3);
         
         this.y += this.driftY * speedMultiplier;
@@ -121,21 +119,26 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
       }
 
       draw(energy: number) {
-        // Opacity reacts slightly
+        const isDark = themeRef.current === 'dark';
+        const darkColors = ['#fcd34d', '#e879f9', '#818cf8', '#34d399']; 
+        const lightColors = ['#d97706', '#be185d', '#4338ca', '#0369a1']; 
+        const colors = isDark ? darkColors : lightColors;
+        const color = colors[this.colorIndex % colors.length];
+
         const normalizedEnergy = Math.max(0, energy / 255);
-        const alpha = isDark ? 0.4 + (normalizedEnergy * 0.4) : 0.6 + (normalizedEnergy * 0.3);
+        const alpha = isDark ? 0.4 + (normalizedEnergy * 0.4) : 0.7 + (normalizedEnergy * 0.2);
 
         ctx!.save();
         ctx!.translate(this.x, this.y);
         ctx!.rotate(this.rotation);
-        ctx!.fillStyle = this.color;
+        ctx!.fillStyle = color;
         ctx!.globalAlpha = alpha;
         ctx!.fillRect(-this.size/2, -this.size/2, this.size, this.size);
         ctx!.restore();
       }
     }
 
-    const stars: Star[] = Array.from({ length: 150 }, () => new Star());
+    const stars: Star[] = Array.from({ length: 200 }, () => new Star());
     const confetti: Confetti[] = Array.from({ length: 50 }, () => new Confetti());
     
     let animationId: number;
@@ -153,9 +156,8 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
         const dataArray = new Uint8Array(bufferLength);
         analyser.getByteFrequencyData(dataArray);
 
-        // Simple frequency banding
-        const bassEnd = Math.floor(bufferLength * 0.1); // ~0-10% (Low Bass)
-        const midEnd = Math.floor(bufferLength * 0.5);  // ~10-50% (Mids)
+        const bassEnd = Math.floor(bufferLength * 0.1); 
+        const midEnd = Math.floor(bufferLength * 0.5); 
 
         let bSum = 0, mSum = 0, hSum = 0;
         let bCount = 0, mCount = 0, hCount = 0;
@@ -174,22 +176,19 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
 
       // --- Draw Bass Pulse (Background Layer) ---
       if (bassEnergy > 0) {
+        const isDark = themeRef.current === 'dark';
         const normalizedBass = bassEnergy / 255;
-        // Draw a large soft glow in the bottom center
         const gradient = ctx.createRadialGradient(
             width / 2, height, 0,
             width / 2, height, width * 0.8
         );
-        // Golden/Warm bass glow
         const alpha = normalizedBass * 0.3; 
         if (isDark) {
-            gradient.addColorStop(0, `rgba(217, 119, 6, ${alpha})`); // Amber-600
-            gradient.addColorStop(0.5, `rgba(88, 28, 135, ${alpha * 0.5})`); // Purple-900
+            gradient.addColorStop(0, `rgba(99, 102, 241, ${alpha})`); // Indigo 500
+            gradient.addColorStop(0.5, `rgba(168, 85, 247, ${alpha * 0.5})`); // Purple 500
             gradient.addColorStop(1, 'rgba(0,0,0,0)');
         } else {
-             // Blue/Teal pulse for light mode
-            gradient.addColorStop(0, `rgba(14, 165, 233, ${alpha})`); // Sky-500
-            gradient.addColorStop(0.5, `rgba(99, 102, 241, ${alpha * 0.5})`); // Indigo-500
+            gradient.addColorStop(0, `rgba(96, 165, 250, ${alpha * 0.2})`); 
             gradient.addColorStop(1, 'rgba(255,255,255,0)');
         }
         
@@ -197,13 +196,11 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
         ctx.fillRect(0, 0, width, height);
       }
 
-      // --- Draw Confetti (Mids) ---
       confetti.forEach(c => {
         c.update(midEnergy);
         c.draw(midEnergy);
       });
 
-      // --- Draw Stars (Highs) ---
       stars.forEach(s => {
         s.update(highEnergy);
         s.draw();
@@ -218,27 +215,28 @@ const Background: React.FC<BackgroundProps> = ({ theme }) => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationId);
     };
-  }, [theme]); // Re-run when theme changes
+  }, []); // Empty dependency array allows animation loop to persist through theme changes
 
   const isDark = theme === 'dark';
 
   return (
-    <div className={`fixed inset-0 z-[-1] overflow-hidden pointer-events-none transition-colors duration-700 ${isDark ? 'bg-[#050505]' : 'bg-slate-50'}`}>
-      {/* Base: Deep Gradient (Static) - Dark Mode */}
-      <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#1a103c] via-[#050505] to-black transition-opacity duration-1000 ${isDark ? 'opacity-80' : 'opacity-0'}`}></div>
+    <div className={`fixed inset-0 z-[-1] overflow-hidden pointer-events-none transition-colors duration-1000 ${isDark ? 'bg-[#000000]' : 'bg-white'}`}>
+      {/* Dark Mode Gradient Base - Cosmic Deep Space */}
+      <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2e1065] via-[#020617] to-black transition-opacity duration-1000 ${isDark ? 'opacity-100' : 'opacity-0'}`}></div>
 
-      {/* Base: Light Gradient (Static) - Light Mode */}
-       <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-blue-100 via-slate-50 to-white transition-opacity duration-1000 ${isDark ? 'opacity-0' : 'opacity-100'}`}></div>
+      {/* Light Mode Pure White Base */}
+       <div className={`absolute inset-0 bg-white transition-opacity duration-1000 ${isDark ? 'opacity-0' : 'opacity-100'}`}></div>
       
-      {/* Canvas Layer for Audio-Reactive Elements */}
-      <canvas ref={canvasRef} className={`absolute inset-0 w-full h-full ${isDark ? 'mix-blend-screen' : 'mix-blend-multiply opacity-50'}`} />
+      {/* LIQUID BLOBS - Optimized with will-change */}
+      <div className={`absolute top-[10%] left-[20%] w-[40rem] h-[40rem] rounded-full mix-blend-screen filter blur-[90px] animate-drift will-change-transform transition-opacity duration-1000 ${isDark ? 'bg-indigo-900/40 opacity-50' : 'opacity-0'}`}></div>
+      <div className={`absolute top-[20%] right-[10%] w-[35rem] h-[35rem] rounded-full mix-blend-screen filter blur-[90px] animate-drift-delayed will-change-transform transition-opacity duration-1000 ${isDark ? 'bg-purple-900/40 opacity-50' : 'opacity-0'}`}></div>
+      <div className={`absolute bottom-[10%] left-[30%] w-[45rem] h-[45rem] rounded-full mix-blend-screen filter blur-[90px] animate-drift will-change-transform transition-opacity duration-1000 ${isDark ? 'bg-blue-900/30 opacity-40' : 'opacity-0'}`} style={{ animationDelay: '5s' }}></div>
+
+      {/* Canvas Layer */}
+      <canvas ref={canvasRef} className={`absolute inset-0 w-full h-full ${isDark ? 'mix-blend-screen' : 'opacity-60'}`} />
       
-      {/* Static Atmospheric Elements (CSS) */}
-      <div className={`absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full blur-[120px] animate-pulse-slow transition-colors duration-1000 ${isDark ? 'bg-fuchsia-900/10' : 'bg-blue-300/20'}`}></div>
-      <div className={`absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full blur-[120px] animate-pulse-slow transition-colors duration-1000 ${isDark ? 'bg-indigo-900/10' : 'bg-indigo-300/20'}`} style={{ animationDelay: '2s' }}></div>
-      
-      {/* Vignette - Only visible in dark mode generally, or very subtle in light */}
-      <div className={`absolute inset-0 bg-[radial-gradient(transparent_0%,_#000000_100%)] transition-opacity duration-1000 ${isDark ? 'opacity-60' : 'opacity-5'}`}></div>
+      {/* Vignette - Only in Dark Mode */}
+      <div className={`absolute inset-0 bg-[radial-gradient(transparent_0%,_#000000_100%)] transition-opacity duration-1000 pointer-events-none ${isDark ? 'opacity-70' : 'opacity-0'}`}></div>
     </div>
   );
 };

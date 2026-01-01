@@ -48,8 +48,18 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const isDark = theme === 'dark';
 
-  // Language State
-  const [language, setLanguage] = useState<Language>('en');
+  // Language State: Initialize based on device language
+  const [language, setLanguage] = useState<Language>(() => {
+    try {
+      if (typeof navigator === 'undefined') return 'en';
+      const browserLang = navigator.language.split('-')[0];
+      const isSupported = LANGUAGES.some(l => l.code === browserLang);
+      return isSupported ? (browserLang as Language) : 'en';
+    } catch {
+      return 'en';
+    }
+  });
+  
   const t = TRANSLATIONS[language];
 
   // Initialize audio context on first user interaction to unlock audio
@@ -218,14 +228,15 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen selection:bg-blue-500/30 relative transition-colors duration-1000 ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
+    <div className={`min-h-screen selection:bg-blue-500/30 relative ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
       <Background theme={theme} />
       {showFireworks && <Fireworks />}
       
-      <header className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors duration-500 ${isDark ? 'bg-black/30 border-white/5' : 'bg-white/70 border-slate-200'}`}>
+      {/* GLASS HEADER */}
+      <header className={`sticky top-0 z-40 backdrop-blur-xl border-b transition-all duration-500 ${isDark ? 'bg-black/10 border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)]' : 'bg-white/90 border-slate-200 shadow-sm'}`}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ring-1 transition-all bg-gradient-to-br from-blue-600 to-indigo-700 shadow-blue-900/20 ring-white/10`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ring-1 transition-all bg-gradient-to-br from-blue-600 to-indigo-700 shadow-blue-900/20 ring-white/10 backdrop-blur-md`}>
               <Globe className="text-white" size={24} />
             </div>
             <div>
@@ -237,7 +248,7 @@ const App: React.FC = () => {
 
           <div className="flex items-center gap-3 md:gap-6">
             <div className={`hidden md:flex items-center gap-6 text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-sm transition-colors ${isDark ? 'bg-white/5 border-white/5' : 'bg-slate-100 border-slate-200'}`}>
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-lg transition-colors ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
                   <div className="w-2 h-2 rounded-full animate-pulse bg-emerald-500"></div>
                   <span>{t.liveUpdates}</span>
                 </div>
@@ -249,7 +260,7 @@ const App: React.FC = () => {
             {/* Theme Toggle */}
             <button 
                 onClick={toggleTheme}
-                className={`p-2 rounded-lg transition-colors ${isDark ? 'hover:bg-white/10 text-slate-400 hover:text-white' : 'hover:bg-slate-200 text-slate-500 hover:text-slate-900'}`}
+                className={`p-2 rounded-lg transition-colors backdrop-blur-md ${isDark ? 'hover:bg-white/10 text-slate-400 hover:text-white' : 'bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-900 border border-slate-200 shadow-sm'}`}
                 aria-label="Toggle theme"
             >
                 {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -257,12 +268,12 @@ const App: React.FC = () => {
 
             {/* Language Selector */}
             <div className="relative group">
-                <div className={`flex items-center gap-2 cursor-pointer p-2 rounded-lg transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-slate-200'}`}>
+                <div className={`flex items-center gap-2 cursor-pointer p-2 rounded-lg transition-colors backdrop-blur-md border border-transparent ${isDark ? 'hover:bg-white/10' : 'bg-white hover:bg-slate-50 border-slate-200 shadow-sm'}`}>
                     <LangIcon size={18} className={isDark ? 'text-slate-400' : 'text-slate-500'} />
                     <select 
                         value={language}
                         onChange={(e) => setLanguage(e.target.value as Language)}
-                        className={`bg-transparent text-sm font-medium outline-none cursor-pointer appearance-none pr-4 ${isDark ? 'text-slate-200' : 'text-slate-700'}`}
+                        className={`bg-transparent text-sm font-medium outline-none cursor-pointer appearance-none pr-4 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}
                     >
                         {LANGUAGES.map(lang => (
                             <option key={lang.code} value={lang.code} className={isDark ? 'bg-slate-900 text-slate-200' : 'bg-white text-slate-900'}>
@@ -278,25 +289,28 @@ const App: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* HERO CARD */}
-          <div className={`lg:col-span-2 relative overflow-hidden backdrop-blur-md rounded-3xl p-8 border shadow-2xl group transition-colors duration-500 ${isDark ? 'bg-slate-900/40 border-white/10' : 'bg-white/60 border-slate-200 shadow-slate-200/50'}`}>
+          {/* LIQUID GLASS HERO CARD */}
+          <div className={`lg:col-span-2 relative overflow-hidden backdrop-blur-xl rounded-3xl p-8 border shadow-2xl group transition-all duration-500 ${isDark ? 'bg-slate-900/30 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]' : 'bg-white border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.05)]'}`}>
+            {/* Glossy sheen */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none"></div>
+
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 text-blue-500 rounded-full border border-blue-500/20 text-xs font-bold uppercase tracking-widest mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 text-blue-500 rounded-full border border-blue-500/20 text-xs font-bold uppercase tracking-widest mb-4 backdrop-blur-md">
                 <Sparkles size={14} />
                 {t.globalTransition}
               </div>
-              <h2 className={`text-4xl md:text-5xl lg:text-6xl font-black mb-2 tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.heroTitle}</h2>
-              <p className={`max-w-lg mb-8 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{t.heroSubtitle}</p>
+              <h2 className={`text-4xl md:text-5xl lg:text-6xl font-black mb-2 tracking-tight drop-shadow-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.heroTitle}</h2>
+              <p className={`max-w-lg mb-8 ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>{t.heroSubtitle}</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {localStatus && (
-                  <div className={`backdrop-blur-xl p-6 rounded-2xl border transition-all duration-500 shadow-xl ${
+                  <div className={`backdrop-blur-2xl p-6 rounded-2xl border transition-all duration-500 shadow-lg ${
                     localStatus.isIn2026 
-                      ? (isDark ? 'bg-emerald-950/40 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200') 
-                      : (isDark ? 'bg-black/40 border-white/10 hover:border-blue-500/30' : 'bg-white/80 border-slate-200 hover:border-blue-300')
+                      ? (isDark ? 'bg-emerald-950/30 border-emerald-500/30' : 'bg-emerald-50/20 border-emerald-100 shadow-emerald-500/10') 
+                      : (isDark ? 'bg-black/20 border-white/10 hover:border-white/20' : 'bg-white border-slate-200 shadow-sm')
                   }`}>
                     <p className={`text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2 ${
-                      localStatus.isIn2026 ? 'text-emerald-500' : (isDark ? 'text-slate-500' : 'text-slate-400')
+                      localStatus.isIn2026 ? 'text-emerald-500' : (isDark ? 'text-slate-400' : 'text-slate-500')
                     }`}>
                       <MapPin size={14} className={localStatus.isIn2026 ? "text-emerald-500" : "text-blue-500"} /> {t.localTime}
                     </p>
@@ -311,7 +325,7 @@ const App: React.FC = () => {
                            // New Countdown Layout
                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 py-2">
                                {/* Days */}
-                               <div className={`flex flex-col items-center p-3 sm:p-4 rounded-xl border backdrop-blur-md min-w-[80px] sm:min-w-[100px] shadow-lg ${isDark ? 'bg-slate-900/50 border-white/10' : 'bg-white border-slate-200'}`}>
+                               <div className={`flex flex-col items-center p-3 sm:p-4 rounded-xl border backdrop-blur-xl min-w-[80px] sm:min-w-[100px] shadow-lg ${isDark ? 'bg-slate-900/40 border-white/10' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
                                    <span key={countdownParts.days} className={`text-5xl sm:text-6xl md:text-7xl font-mono font-black tracking-tighter animate-slide-up block ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                        {countdownParts.days}
                                    </span>
@@ -319,7 +333,7 @@ const App: React.FC = () => {
                                </div>
 
                                {/* Hours */}
-                               <div className={`flex flex-col items-center p-3 sm:p-4 rounded-xl border backdrop-blur-md min-w-[80px] sm:min-w-[100px] shadow-lg ${isDark ? 'bg-slate-900/50 border-white/10' : 'bg-white border-slate-200'}`}>
+                               <div className={`flex flex-col items-center p-3 sm:p-4 rounded-xl border backdrop-blur-xl min-w-[80px] sm:min-w-[100px] shadow-lg ${isDark ? 'bg-slate-900/40 border-white/10' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
                                    <span key={countdownParts.hours} className={`text-5xl sm:text-6xl md:text-7xl font-mono font-black tracking-tighter animate-slide-up block ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                        {countdownParts.hours}
                                    </span>
@@ -327,7 +341,7 @@ const App: React.FC = () => {
                                </div>
 
                                {/* Minutes */}
-                               <div className={`flex flex-col items-center p-3 sm:p-4 rounded-xl border backdrop-blur-md min-w-[80px] sm:min-w-[100px] shadow-lg ${isDark ? 'bg-slate-900/50 border-white/10' : 'bg-white border-slate-200'}`}>
+                               <div className={`flex flex-col items-center p-3 sm:p-4 rounded-xl border backdrop-blur-xl min-w-[80px] sm:min-w-[100px] shadow-lg ${isDark ? 'bg-slate-900/40 border-white/10' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
                                    <span key={countdownParts.minutes} className={`text-5xl sm:text-6xl md:text-7xl font-mono font-black tracking-tighter animate-slide-up block ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                        {countdownParts.minutes}
                                    </span>
@@ -335,7 +349,7 @@ const App: React.FC = () => {
                                </div>
 
                                {/* Seconds */}
-                               <div className={`flex flex-col items-center p-3 sm:p-4 rounded-xl border backdrop-blur-md min-w-[80px] sm:min-w-[100px] shadow-lg relative overflow-hidden ${isDark ? 'bg-gradient-to-b from-slate-900/50 to-amber-900/20 border-amber-500/20 shadow-amber-900/10' : 'bg-gradient-to-b from-white to-amber-50 border-amber-200 shadow-amber-100'}`}>
+                               <div className={`flex flex-col items-center p-3 sm:p-4 rounded-xl border backdrop-blur-xl min-w-[80px] sm:min-w-[100px] shadow-lg relative overflow-hidden ${isDark ? 'bg-gradient-to-b from-slate-900/40 to-amber-900/20 border-amber-500/20 shadow-amber-900/10' : 'bg-white border-amber-200 shadow-amber-100/50'}`}>
                                    <div className="absolute inset-0 bg-amber-500/5"></div>
                                    <span key={countdownParts.seconds} className="text-5xl sm:text-6xl md:text-7xl font-mono font-black text-gradient-gold tracking-tighter animate-slide-up block relative z-10">
                                        {countdownParts.seconds}
@@ -356,7 +370,7 @@ const App: React.FC = () => {
                 )}
 
                 {stats.next && (
-                  <div className={`backdrop-blur-md p-6 rounded-2xl border shadow-xl transition-all relative overflow-hidden group/next cursor-pointer ${isDark ? 'bg-blue-600/10 border-blue-500/10 hover:bg-blue-600/20' : 'bg-blue-50 border-blue-100 hover:bg-blue-100'}`} onClick={() => handleCountryClick(stats.next!.country)}>
+                  <div className={`backdrop-blur-2xl p-6 rounded-2xl border shadow-xl transition-all relative overflow-hidden group/next cursor-pointer ${isDark ? 'bg-blue-600/10 border-blue-500/10 hover:bg-blue-600/20' : 'bg-white border-blue-100 hover:border-blue-300 shadow-sm'}`} onClick={() => handleCountryClick(stats.next!.country)}>
                     {/* Decorative glow */}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[50px] rounded-full pointer-events-none group-hover/next:bg-blue-500/20 transition-colors"></div>
 
@@ -365,13 +379,13 @@ const App: React.FC = () => {
                         <p className="text-xs text-blue-500 uppercase tracking-widest font-bold flex items-center gap-2">
                           <Timer size={14} /> {t.nextArrival}
                         </p>
-                        <div className={`p-1 rounded-full transition-colors ${isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-white hover:bg-slate-50'}`}>
+                        <div className={`p-1 rounded-full transition-colors backdrop-blur-md ${isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-50 hover:bg-slate-100 border border-slate-200'}`}>
                            <ChevronRight size={14} className="text-blue-400" />
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-4 mb-5">
-                        <div className={`w-14 h-10 rounded-md overflow-hidden shadow-lg border flex-shrink-0 relative ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
+                        <div className={`w-14 h-10 rounded-md overflow-hidden shadow-lg border flex-shrink-0 relative ${isDark ? 'border-white/10' : 'border-slate-200 bg-white'}`}>
                            <img 
                               src={`https://flagcdn.com/w160/${stats.next.code.toLowerCase()}.png`}
                               alt={stats.next.country}
@@ -402,7 +416,7 @@ const App: React.FC = () => {
                       </div>
 
                       <div className="mt-auto">
-                        <div className={`h-1.5 w-full rounded-full overflow-hidden border ${isDark ? 'bg-slate-900/50 border-white/5' : 'bg-white border-slate-200'}`}>
+                        <div className={`h-1.5 w-full rounded-full overflow-hidden border ${isDark ? 'bg-slate-900/50 border-white/5' : 'bg-slate-100 border-slate-200'}`}>
                            <div className="h-full bg-gradient-to-r from-blue-600 to-indigo-400 animate-pulse-slow" style={{ width: '65%' }}></div>
                         </div>
                       </div>
@@ -413,20 +427,20 @@ const App: React.FC = () => {
             </div>
             
             {/* Subtle glow effects behind hero */}
-            <div className={`absolute top-0 right-0 w-[500px] h-[500px] blur-[120px] rounded-full pointer-events-none ${isDark ? 'bg-blue-600/10' : 'bg-blue-400/10'}`}></div>
-            <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] blur-[100px] rounded-full pointer-events-none ${isDark ? 'bg-indigo-600/10' : 'bg-indigo-400/10'}`}></div>
+            <div className={`absolute top-0 right-0 w-[500px] h-[500px] blur-[120px] rounded-full pointer-events-none ${isDark ? 'bg-blue-600/10' : 'bg-blue-200/20'}`}></div>
+            <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] blur-[100px] rounded-full pointer-events-none ${isDark ? 'bg-indigo-600/10' : 'bg-indigo-200/20'}`}></div>
           </div>
 
-          {/* STATUS PANEL */}
-          <div className={`backdrop-blur-md rounded-3xl p-6 border flex flex-col justify-between shadow-xl ${isDark ? 'bg-slate-900/40 border-white/5' : 'bg-white/60 border-slate-200 shadow-slate-200/50'}`}>
+          {/* LIQUID GLASS STATUS PANEL */}
+          <div className={`backdrop-blur-xl rounded-3xl p-6 border flex flex-col justify-between shadow-xl ${isDark ? 'bg-slate-900/30 border-white/10' : 'bg-white border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.05)]'}`}>
             <div>
               <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.globalStatus}</h3>
               <div className="space-y-4">
-                <div className={`flex justify-between items-center p-3 rounded-xl border ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-slate-100'}`}>
+                <div className={`flex justify-between items-center p-3 rounded-xl border backdrop-blur-md ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
                   <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{t.countriesIn2026}</span>
                   <span className="text-xl font-bold text-emerald-500 animate-pop" key={stats.in2026}>{stats.in2026}</span>
                 </div>
-                <div className={`flex justify-between items-center p-3 rounded-xl border ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-slate-100'}`}>
+                <div className={`flex justify-between items-center p-3 rounded-xl border backdrop-blur-md ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
                   <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{t.remainingCount}</span>
                   <span className="text-xl font-bold text-blue-500 animate-pop" key={stats.remaining}>{stats.remaining}</span>
                 </div>
@@ -439,7 +453,7 @@ const App: React.FC = () => {
               </p>
               <button 
                 onClick={() => handleCountryClick(stats.next?.country || 'Kiribati')}
-                className={`w-full py-3 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg ${isDark ? 'bg-white text-black hover:bg-slate-200 shadow-white/5' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20'}`}
+                className={`w-full py-3 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg backdrop-blur-sm ${isDark ? 'bg-white text-black hover:bg-slate-200 shadow-white/5' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20'}`}
               >
                 {t.learnTraditions}
               </button>
@@ -457,28 +471,28 @@ const App: React.FC = () => {
         />
 
         {/* Search & View Controls */}
-        <div className={`flex flex-col md:flex-row gap-4 mb-8 items-center justify-between sticky top-20 z-30 p-2 -mx-2 rounded-2xl backdrop-blur-sm border transition-colors ${isDark ? 'bg-black/20 border-white/0 md:border-white/5' : 'bg-white/40 border-slate-200'}`}>
+        <div className={`flex flex-col md:flex-row gap-4 mb-8 items-center justify-between sticky top-20 z-30 p-2 -mx-2 rounded-2xl backdrop-blur-xl border transition-colors shadow-lg ${isDark ? 'bg-black/20 border-white/10 shadow-black/10' : 'bg-white/90 border-slate-200 shadow-sm'}`}>
           <div className="relative w-full md:w-96">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
             <input 
               type="text" 
               placeholder={t.searchPlaceholder}
-              className={`w-full border rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-slate-600 ${isDark ? 'bg-slate-900/80 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
+              className={`w-full border rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-slate-600 ${isDark ? 'bg-slate-900/60 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900 focus:bg-white'}`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          <div className={`flex items-center gap-2 p-1 rounded-xl border ${isDark ? 'bg-slate-900/80 border-white/10' : 'bg-white border-slate-200'}`}>
+          <div className={`flex items-center gap-2 p-1 rounded-xl border ${isDark ? 'bg-slate-900/60 border-white/10' : 'bg-white border-slate-200'}`}>
             <button 
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-slate-100 text-slate-900 shadow-sm') : 'text-slate-400 hover:text-slate-500'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-slate-100 text-slate-900 shadow-inner') : 'text-slate-400 hover:text-slate-500'}`}
             >
               <LayoutGrid size={20} />
             </button>
             <button 
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-slate-100 text-slate-900 shadow-sm') : 'text-slate-400 hover:text-slate-500'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-slate-100 text-slate-900 shadow-inner') : 'text-slate-400 hover:text-slate-500'}`}
             >
               <List size={20} />
             </button>
@@ -490,7 +504,7 @@ const App: React.FC = () => {
           {arrivedCountries.length > 0 && (
             <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-500 border border-emerald-500/20">
+                <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-500 border border-emerald-500/20 backdrop-blur-sm">
                   <CheckCircle2 size={24} />
                 </div>
                 <div>
@@ -522,7 +536,7 @@ const App: React.FC = () => {
           {upcomingCountries.length > 0 && (
             <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
               <div className="flex items-center gap-3 mb-6">
-                 <div className="p-2 bg-blue-500/20 rounded-lg text-blue-500 border border-blue-500/20">
+                 <div className="p-2 bg-blue-500/20 rounded-lg text-blue-500 border border-blue-500/20 backdrop-blur-sm">
                   <Clock size={24} />
                 </div>
                 <div>
@@ -551,7 +565,7 @@ const App: React.FC = () => {
           )}
 
           {filteredStatuses.length === 0 && (
-            <div className={`text-center py-20 rounded-3xl border border-dashed ${isDark ? 'bg-slate-900/40 border-white/5' : 'bg-white/60 border-slate-200'}`}>
+            <div className={`text-center py-20 rounded-3xl border border-dashed ${isDark ? 'bg-slate-900/20 border-white/5' : 'bg-white border-slate-300'}`}>
               <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`}>
                 <Search className="text-slate-500" />
               </div>
@@ -572,10 +586,10 @@ const App: React.FC = () => {
         theme={theme}
       />
 
-      <footer className={`mt-20 border-t py-12 px-4 backdrop-blur-xl relative z-10 ${isDark ? 'border-white/5 bg-slate-950/80' : 'border-slate-200 bg-white/80'}`}>
+      <footer className={`mt-20 border-t py-12 px-4 backdrop-blur-xl relative z-10 ${isDark ? 'border-white/5 bg-slate-950/60' : 'border-slate-200 bg-white/70'}`}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-2xl ${isDark ? 'bg-white/5' : 'bg-slate-100'}`}>
+            <div className={`p-3 rounded-2xl ${isDark ? 'bg-white/5' : 'bg-white shadow-sm border border-slate-200'}`}>
               <Globe className="text-slate-400" size={24} />
             </div>
             <div>

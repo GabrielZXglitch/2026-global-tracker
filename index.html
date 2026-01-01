@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +12,7 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #030712;
-      color: #f9fafb;
+      /* Background color handling moved to App.tsx to support theming */
     }
     
     /* Animations */
@@ -47,6 +47,22 @@
     }
     .animate-pop {
       animation: pop-in 0.2s ease-out;
+    }
+
+    /* Liquid Blobs Animation */
+    @keyframes drift {
+      0% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+      100% { transform: translate(0px, 0px) scale(1); }
+    }
+    
+    .animate-drift {
+      animation: drift 20s infinite ease-in-out;
+    }
+    
+    .animate-drift-delayed {
+      animation: drift 25s infinite ease-in-out reverse;
     }
 
     /* Gradient Text Utilities */
