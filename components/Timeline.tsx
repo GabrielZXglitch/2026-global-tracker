@@ -1,13 +1,13 @@
 
-import React, { useMemo } from 'react';
-import { TimeZoneData, TransitionStatus } from '../types';
+import React, { useMemo, useCallback } from 'react';
+import { TimeZoneData, TransitionStatus, AppTranslations } from '../types';
 import { TARGET_DATE_UTC } from '../constants';
 
 interface TimelineProps {
   timezones: TimeZoneData[];
   currentTime: number;
   statuses: TransitionStatus[];
-  t: any;
+  t: AppTranslations;
   theme: 'dark' | 'light';
 }
 
@@ -26,9 +26,9 @@ const Timeline: React.FC<TimelineProps> = ({
   const DURATION = END_UTC - START_UTC;
   const isDark = theme === 'dark';
 
-  const getPositionPercent = (time: number) => {
+  const getPositionPercent = useCallback((time: number) => {
     return Math.max(0, Math.min(100, ((time - START_UTC) / DURATION) * 100));
-  };
+  }, [START_UTC, DURATION]);
 
   // Group countries by arrival time for markers
   const markers = useMemo(() => {
@@ -44,7 +44,7 @@ const Timeline: React.FC<TimelineProps> = ({
       count,
       left: getPositionPercent(time)
     }));
-  }, [timezones]);
+  }, [timezones, getPositionPercent]);
 
   const currentPercent = getPositionPercent(currentTime);
 

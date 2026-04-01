@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { CelebrationInsight } from '../types';
+import { CelebrationInsight, AppTranslations } from '../types';
 import { Sparkles, Languages, PartyPopper, Info, X } from 'lucide-react';
 
 interface InsightPanelProps {
   insight: CelebrationInsight | null;
   loading: boolean;
   onClose: () => void;
-  t: any;
+  t: AppTranslations;
   theme: 'dark' | 'light';
 }
 

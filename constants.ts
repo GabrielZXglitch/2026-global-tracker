@@ -1,5 +1,5 @@
 
-import { TimeZoneData } from './types';
+import { TimeZoneData, AppTranslations } from './types';
 
 // Target for New Year 2026 in UTC
 export const TARGET_YEAR = 2026;
@@ -40,7 +40,7 @@ export const LANGUAGES: { code: Language; label: string }[] = [
   { code: 'ja', label: '日本語' },
 ];
 
-export const TRANSLATIONS = {
+export const TRANSLATIONS: Record<Language, AppTranslations> = {
   en: {
     appTitle: "2026 TRACKER",
     liveUpdates: "Live Updates",

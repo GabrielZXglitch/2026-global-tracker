@@ -6,9 +6,9 @@ let noiseBuffer: AudioBuffer | null = null;
 
 export const initAudio = () => {
   if (!audioCtx) {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    if (AudioContext) {
-      audioCtx = new AudioContext();
+    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
       analyser = audioCtx.createAnalyser();
       analyser.fftSize = 512; 
       analyser.smoothingTimeConstant = 0.7; // Smoother visuals for complex sounds
@@ -53,7 +53,7 @@ export const playCountdownBeep = () => {
         osc.frequency.setValueAtTime(800, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
         
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime); // Increased gain
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
         
         osc.connect(gain);
@@ -76,7 +76,7 @@ export const playTick = () => {
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
     
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime); // Increased gain
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
 
     osc.connect(gain);
@@ -104,7 +104,7 @@ export const playSparkle = () => {
         osc.frequency.setValueAtTime(freq, now + (i*0.05));
         
         gain.gain.setValueAtTime(0, now + (i*0.05));
-        gain.gain.linearRampToValueAtTime(0.02, now + (i*0.05) + 0.02);
+        gain.gain.linearRampToValueAtTime(0.1, now + (i*0.05) + 0.02); // Increased gain
         gain.gain.exponentialRampToValueAtTime(0.001, now + (i*0.05) + 0.2);
 
         osc.connect(gain);
@@ -137,7 +137,7 @@ export const playWhoosh = () => {
     filter.frequency.exponentialRampToValueAtTime(3000, now + 1.5);
     
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.05, now + 0.5);
+    gain.gain.linearRampToValueAtTime(0.2, now + 0.5); // Increased gain
     gain.gain.linearRampToValueAtTime(0, now + 1.5);
     
     source.connect(filter);
@@ -169,7 +169,7 @@ export const playPop = () => {
     filter.frequency.setValueAtTime(1000, now);
     filter.frequency.exponentialRampToValueAtTime(100, now + 0.1);
     
-    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.setValueAtTime(0.7, now); // Increased gain significantly
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
     
     source.connect(filter);
@@ -197,11 +197,13 @@ export const playCelebrationSound = () => {
       osc.frequency.setValueAtTime(freq, now + (i * 0.05));
       
       gain.gain.setValueAtTime(0, now + (i * 0.05));
-      gain.gain.linearRampToValueAtTime(0.08, now + (i * 0.05) + 0.1);
+      gain.gain.linearRampToValueAtTime(0.2, now + (i * 0.05) + 0.1); // Increased gain
       gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.05) + 4); // Long sustain
       
       osc.connect(gain);
-      gain.connect(analyser!); 
+      if (analyser) {
+        gain.connect(analyser); 
+      }
       
       osc.start(now + (i * 0.05));
       osc.stop(now + (i * 0.05) + 4);
@@ -209,6 +211,7 @@ export const playCelebrationSound = () => {
 
     // 2. Initial Burst
     playPop();
+    setTimeout(() => { playPop(); playSparkle(); }, 200); // More varied burst
     setTimeout(playSparkle, 500);
   } catch (e) {
     console.error("Audio playback failed", e);
@@ -216,7 +219,6 @@ export const playCelebrationSound = () => {
 };
 
 export const playRandomEffect = () => {
-    const effects = [playSparkle, playPop, playWhoosh];
     // Weighted random: Pops are common, Sparkles common, Whooshes rare
     const r = Math.random();
     if (r < 0.4) playPop();

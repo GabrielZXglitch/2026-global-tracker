@@ -25,3 +25,45 @@ export interface CelebrationInsight {
   greeting: string;
   funFact: string;
 }
+
+export interface AppTranslations {
+  appTitle: string;
+  liveUpdates: string;
+  countriesIn2026: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  globalTransition: string;
+  localTime: string;
+  happyNewYear: string;
+  days: string;
+  hrs: string;
+  min: string;
+  sec: string;
+  nextArrival: string;
+  remaining: string;
+  globalStatus: string;
+  remainingCount: string;
+  learnTraditions: string;
+  searchPlaceholder: string;
+  welcome: string;
+  celebrating: string;
+  countdownTitle: string;
+  awaiting: string;
+  noResults: string;
+  footerText: string;
+  poweredBy: string;
+  disclaimer: string;
+  cardLocalTime: string;
+  cardStatus: string;
+  cardCountdown: string;
+  cardLive: string;
+  cardToGo: string;
+  insightTitle: string;
+  insightCountry: string;
+  insightGreeting: string;
+  insightTradition: string;
+  insightFunFact: string;
+  insightGenerated: string;
+  dayShort: string;
+  timelineTitle: string;
+}

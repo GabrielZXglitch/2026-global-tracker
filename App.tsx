@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { motion } from 'motion/react';
 import { TIMEZONES, TARGET_DATE_UTC, TARGET_YEAR, LANGUAGES, TRANSLATIONS, Language } from './constants';
-import { TransitionStatus, CelebrationInsight } from './types';
+import { TransitionStatus, CelebrationInsight, AppTranslations } from './types';
 import TimeCard from './components/TimeCard';
 import InsightPanel from './components/InsightPanel';
 import Fireworks from './components/Fireworks';
@@ -44,6 +44,8 @@ const App: React.FC = () => {
   const [showFireworks, setShowFireworks] = useState(false);
   const lastAudioSecondRef = useRef<number>(-1);
 
+  const hasCelebratedRef = useRef<boolean>(false);
+
   // Theme State
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const isDark = theme === 'dark';
@@ -60,7 +62,7 @@ const App: React.FC = () => {
     }
   });
   
-  const t = TRANSLATIONS[language];
+  const t: AppTranslations = TRANSLATIONS[language];
 
   // Initialize audio context on first user interaction to unlock audio
   useEffect(() => {
@@ -77,10 +79,10 @@ const App: React.FC = () => {
 
   // Update real-time clock
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       setNow(new Date());
     }, 1000);
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, []);
 
   // Calculate statuses for all tracked zones based on now
@@ -164,15 +166,17 @@ const App: React.FC = () => {
   // Trigger fireworks and celebration sound
   useEffect(() => {
     if (localStatus?.isIn2026) {
-      if (!showFireworks) {
+      if (!hasCelebratedRef.current) {
+        hasCelebratedRef.current = true;
         setShowFireworks(true);
         playCelebrationSound();
-        const timer = setTimeout(() => {
+        const timer = window.setTimeout(() => {
           setShowFireworks(false);
         }, 20000);
-        return () => clearTimeout(timer);
+        return () => window.clearTimeout(timer);
       }
     } else {
+      hasCelebratedRef.current = false;
       setShowFireworks(false);
     }
   }, [localStatus?.isIn2026]);
@@ -180,13 +184,13 @@ const App: React.FC = () => {
   // Random Atmospheric Sounds during Fireworks
   useEffect(() => {
     if (showFireworks) {
-        const interval = setInterval(() => {
-            // 40% chance every 800ms to play a random ambient effect
-            if (Math.random() > 0.6) {
+        const interval = window.setInterval(() => {
+            // Increased frequency for better effect (50% chance every 600ms)
+            if (Math.random() > 0.5) {
                 playRandomEffect();
             }
-        }, 800);
-        return () => clearInterval(interval);
+        }, 600);
+        return () => window.clearInterval(interval);
     }
   }, [showFireworks]);
 
@@ -290,7 +294,10 @@ const App: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* LIQUID GLASS HERO CARD */}
-          <div className={`lg:col-span-2 relative overflow-hidden backdrop-blur-xl rounded-3xl p-8 border shadow-2xl group transition-all duration-500 ${isDark ? 'bg-slate-900/30 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]' : 'bg-white border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.05)]'}`}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`lg:col-span-2 relative overflow-hidden backdrop-blur-xl rounded-3xl p-8 border shadow-2xl group transition-all duration-500 ${isDark ? 'bg-slate-900/30 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]' : 'bg-white border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.05)]'}`}>
             {/* Glossy sheen */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none"></div>
 
@@ -429,10 +436,13 @@ const App: React.FC = () => {
             {/* Subtle glow effects behind hero */}
             <div className={`absolute top-0 right-0 w-[500px] h-[500px] blur-[120px] rounded-full pointer-events-none ${isDark ? 'bg-blue-600/10' : 'bg-blue-200/20'}`}></div>
             <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] blur-[100px] rounded-full pointer-events-none ${isDark ? 'bg-indigo-600/10' : 'bg-indigo-200/20'}`}></div>
-          </div>
+          </motion.div>
 
           {/* LIQUID GLASS STATUS PANEL */}
-          <div className={`backdrop-blur-xl rounded-3xl p-6 border flex flex-col justify-between shadow-xl ${isDark ? 'bg-slate-900/30 border-white/10' : 'bg-white border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.05)]'}`}>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className={`backdrop-blur-xl rounded-3xl p-6 border flex flex-col justify-between shadow-xl ${isDark ? 'bg-slate-900/30 border-white/10' : 'bg-white border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.05)]'}`}>
             <div>
               <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.globalStatus}</h3>
               <div className="space-y-4">
@@ -458,7 +468,7 @@ const App: React.FC = () => {
                 {t.learnTraditions}
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* TIMELINE COMPONENT */}
@@ -502,7 +512,11 @@ const App: React.FC = () => {
         <div className="space-y-12">
           {/* Section: Arrived in 2026 */}
           {arrivedCountries.length > 0 && (
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <motion.section 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+            >
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-500 border border-emerald-500/20 backdrop-blur-sm">
                   <CheckCircle2 size={24} />
@@ -529,12 +543,16 @@ const App: React.FC = () => {
                   />
                 ))}
               </div>
-            </section>
+            </motion.section>
           )}
 
           {/* Section: Counting Down */}
           {upcomingCountries.length > 0 && (
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            <motion.section 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100"
+            >
               <div className="flex items-center gap-3 mb-6">
                  <div className="p-2 bg-blue-500/20 rounded-lg text-blue-500 border border-blue-500/20 backdrop-blur-sm">
                   <Clock size={24} />
@@ -561,7 +579,7 @@ const App: React.FC = () => {
                   />
                 ))}
               </div>
-            </section>
+            </motion.section>
           )}
 
           {filteredStatuses.length === 0 && (

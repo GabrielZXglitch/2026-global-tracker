@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { TransitionStatus } from '../types';
+import { motion } from 'motion/react';
+import { TransitionStatus, AppTranslations } from '../types';
 import { Clock, CheckCircle2, Timer, Info, CalendarPlus } from 'lucide-react';
 import { downloadCalendarEvent } from '../services/calendarService';
 
@@ -10,7 +11,7 @@ interface TimeCardProps {
   isSelected: boolean;
   isNext?: boolean;
   variant?: 'grid' | 'list';
-  t: any;
+  t: AppTranslations;
   theme: 'dark' | 'light';
 }
 
@@ -56,13 +57,17 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
 
   if (isList) {
     return (
-      <div 
+      <motion.div 
+        layout
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.02 }}
         onClick={() => onClick(status.country)}
-        className={`relative overflow-hidden cursor-pointer transition-all duration-300 p-3 rounded-lg border flex items-center justify-between gap-4 backdrop-blur-xl hover:scale-[1.02] hover:shadow-lg ${
+        className={`relative overflow-hidden cursor-pointer transition-all duration-300 p-3 rounded-lg border flex items-center justify-between gap-4 backdrop-blur-xl hover:shadow-lg ${
           status.isIn2026 
             ? (isDark ? 'bg-emerald-950/30 border-emerald-500/30 hover:bg-emerald-900/40' : 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100')
             : (isNext 
-                ? (isDark ? 'bg-blue-900/30 border-blue-400/60 ring-1 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : 'bg-white border-blue-300 ring-1 ring-blue-200 shadow-sm')
+                ? (isDark ? 'bg-blue-900/30 border-blue-400/60 ring-1 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.25)]' : 'bg-white border-blue-300 ring-1 ring-blue-200 shadow-sm')
                 : (isDark ? 'bg-slate-900/30 border-white/5 hover:border-white/20 hover:bg-slate-800/40' : 'bg-white border-slate-200 hover:border-blue-300 shadow-sm')
               )
         } ${isSelected ? 'ring-2 ring-blue-500' : ''} group`}
@@ -163,15 +168,19 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
              </p>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   // Grid Variant (Default)
   return (
-    <div 
+    <motion.div 
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ scale: 1.02 }}
       onClick={() => onClick(status.country)}
-      className={`relative overflow-hidden cursor-pointer transition-all duration-300 p-4 rounded-xl border backdrop-blur-xl hover:scale-[1.02] hover:shadow-xl ${
+      className={`relative overflow-hidden cursor-pointer transition-all duration-300 p-4 rounded-xl border backdrop-blur-xl hover:shadow-xl ${
         status.isIn2026 
           ? (isDark ? 'bg-emerald-950/30 border-emerald-500/40 hover:bg-emerald-900/40 shadow-[0_4px_20px_rgba(16,185,129,0.1)]' : 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100 shadow-sm') 
           : (isNext
@@ -263,7 +272,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
       
       {/* Background decoration */}
       <div className={`absolute -bottom-6 -right-6 w-20 h-20 rounded-full opacity-5 blur-xl transition-opacity duration-500 group-hover:opacity-10 ${status.isIn2026 ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>
-    </div>
+    </motion.div>
   );
 };
 
