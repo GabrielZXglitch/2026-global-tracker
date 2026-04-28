@@ -101,14 +101,14 @@ const App: React.FC = () => {
       
       const localTimeStr = formatter.format(now);
       const zoneStartUTC = TARGET_DATE_UTC - (tz.offset * 60 * 1000);
-      const timeTo2026 = zoneStartUTC - now.getTime();
-      const isIn2026 = timeTo2026 <= 0;
+      const timeTo2027 = zoneStartUTC - now.getTime();
+      const isIn2027 = timeTo2027 <= 0;
 
       return {
         ...tz,
-        isIn2026,
+        isIn2027,
         localTime: localTimeStr,
-        timeTo2026,
+        timeTo2027,
         offset: tz.offset
       } as TransitionStatus;
     }).sort((a, b) => b.offset - a.offset);
@@ -126,16 +126,16 @@ const App: React.FC = () => {
         hour12: false
       });
       const localTimeStr = formatter.format(now);
-      const isIn2026 = now.getFullYear() >= TARGET_YEAR;
+      const isIn2027 = now.getFullYear() >= TARGET_YEAR;
       
-      const startOf2026Local = new Date(TARGET_YEAR, 0, 1, 0, 0, 0);
-      const timeTo2026 = startOf2026Local.getTime() - now.getTime();
+      const startOf2027Local = new Date(TARGET_YEAR, 0, 1, 0, 0, 0);
+      const timeTo2027 = startOf2027Local.getTime() - now.getTime();
       const userOffset = -new Date().getTimezoneOffset();
 
       // --- AUDIO CUES ---
-      if (timeTo2026 > 0 && timeTo2026 <= 60000) {
+      if (timeTo2027 > 0 && timeTo2027 <= 60000) {
         // Use ceil so 9.5s remaining counts as "10"
-        const currentSecond = Math.ceil(timeTo2026 / 1000);
+        const currentSecond = Math.ceil(timeTo2027 / 1000);
         
         if (currentSecond !== lastAudioSecondRef.current) {
              if (currentSecond <= 10) {
@@ -153,9 +153,9 @@ const App: React.FC = () => {
         zone: userZone,
         country: 'Local Horizon',
         code: 'UN', 
-        isIn2026,
+        isIn2027,
         localTime: localTimeStr,
-        timeTo2026,
+        timeTo2027,
         offset: userOffset
       });
     } catch (e) {
@@ -165,7 +165,7 @@ const App: React.FC = () => {
 
   // Trigger fireworks and celebration sound
   useEffect(() => {
-    if (localStatus?.isIn2026) {
+    if (localStatus?.isIn2027) {
       if (!hasCelebratedRef.current) {
         hasCelebratedRef.current = true;
         setShowFireworks(true);
@@ -179,7 +179,7 @@ const App: React.FC = () => {
       hasCelebratedRef.current = false;
       setShowFireworks(false);
     }
-  }, [localStatus?.isIn2026]);
+  }, [localStatus?.isIn2027]);
 
   // Random Atmospheric Sounds during Fireworks
   useEffect(() => {
@@ -210,21 +210,21 @@ const App: React.FC = () => {
     );
   }, [statuses, searchTerm]);
 
-  const arrivedCountries = useMemo(() => filteredStatuses.filter(s => s.isIn2026), [filteredStatuses]);
-  const upcomingCountries = useMemo(() => filteredStatuses.filter(s => !s.isIn2026), [filteredStatuses]);
+  const arrivedCountries = useMemo(() => filteredStatuses.filter(s => s.isIn2027), [filteredStatuses]);
+  const upcomingCountries = useMemo(() => filteredStatuses.filter(s => !s.isIn2027), [filteredStatuses]);
 
   const stats = useMemo(() => {
-    const in2026 = statuses.filter(s => s.isIn2026).length;
+    const in2027 = statuses.filter(s => s.isIn2027).length;
     return {
-      in2026,
-      remaining: statuses.length - in2026,
-      next: statuses.find(s => !s.isIn2026)
+      in2027,
+      remaining: statuses.length - in2027,
+      next: statuses.find(s => !s.isIn2027)
     };
   }, [statuses]);
 
   // Breakdown for Hero Animation
   const countdownParts = localStatus 
-    ? formatFullCountdownParts(localStatus.timeTo2026) 
+    ? formatFullCountdownParts(localStatus.timeTo2027) 
     : { days: "00", hours: "00", minutes: "00", seconds: "00" };
 
   const toggleTheme = () => {
@@ -257,7 +257,7 @@ const App: React.FC = () => {
                   <span>{t.liveUpdates}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                 <span className={isDark ? 'text-white' : 'text-slate-900'}>{stats.in2026}</span> {t.countriesIn2026}
+                 <span className={isDark ? 'text-white' : 'text-slate-900'}>{stats.in2027}</span> {t.countriesIn2027}
                 </div>
             </div>
 
@@ -312,19 +312,19 @@ const App: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {localStatus && (
                   <div className={`backdrop-blur-2xl p-6 rounded-2xl border transition-all duration-500 shadow-lg ${
-                    localStatus.isIn2026 
+                    localStatus.isIn2027 
                       ? (isDark ? 'bg-emerald-950/30 border-emerald-500/30' : 'bg-emerald-50/20 border-emerald-100 shadow-emerald-500/10') 
                       : (isDark ? 'bg-black/20 border-white/10 hover:border-white/20' : 'bg-white border-slate-200 shadow-sm')
                   }`}>
                     <p className={`text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2 ${
-                      localStatus.isIn2026 ? 'text-emerald-500' : (isDark ? 'text-slate-400' : 'text-slate-500')
+                      localStatus.isIn2027 ? 'text-emerald-500' : (isDark ? 'text-slate-400' : 'text-slate-500')
                     }`}>
-                      <MapPin size={14} className={localStatus.isIn2026 ? "text-emerald-500" : "text-blue-500"} /> {t.localTime}
+                      <MapPin size={14} className={localStatus.isIn2027 ? "text-emerald-500" : "text-blue-500"} /> {t.localTime}
                     </p>
                     
                     {/* ANIMATED COUNTDOWN DISPLAY */}
                     <div className="flex flex-col">
-                        {localStatus.isIn2026 ? (
+                        {localStatus.isIn2027 ? (
                            <span className="text-4xl md:text-6xl font-mono font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 animate-pop py-4">
                              {t.happyNewYear}
                            </span>
@@ -367,7 +367,7 @@ const App: React.FC = () => {
                         )}
                     </div>
 
-                    {!localStatus.isIn2026 && (
+                    {!localStatus.isIn2027 && (
                       <div className={`mt-4 pt-4 border-t flex items-center gap-2 ${isDark ? 'border-white/5' : 'border-slate-200'}`}>
                         <Clock size={14} className="text-slate-500" />
                         <span key={localStatus.localTime} className={`text-xs font-mono animate-slide-up ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{localStatus.localTime}</span>
@@ -408,7 +408,7 @@ const App: React.FC = () => {
 
                       <div className={`flex items-end gap-2 font-mono mb-4 ${isDark ? 'text-blue-200' : 'text-blue-600'}`}>
                          {(() => {
-                           const parts = formatFullCountdownParts(stats.next.timeTo2026);
+                           const parts = formatFullCountdownParts(stats.next.timeTo2027);
                            const displayTime = parts.days !== "00" 
                               ? `${parts.days}${t.dayShort} ${parts.hours}h ${parts.minutes}m` 
                               : `${parts.hours}:${parts.minutes}:${parts.seconds}`;
@@ -447,8 +447,8 @@ const App: React.FC = () => {
               <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.globalStatus}</h3>
               <div className="space-y-4">
                 <div className={`flex justify-between items-center p-3 rounded-xl border backdrop-blur-md ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
-                  <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{t.countriesIn2026}</span>
-                  <span className="text-xl font-bold text-emerald-500 animate-pop" key={stats.in2026}>{stats.in2026}</span>
+                  <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{t.countriesIn2027}</span>
+                  <span className="text-xl font-bold text-emerald-500 animate-pop" key={stats.in2027}>{stats.in2027}</span>
                 </div>
                 <div className={`flex justify-between items-center p-3 rounded-xl border backdrop-blur-md ${isDark ? 'bg-white/5 border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
                   <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{t.remainingCount}</span>
@@ -510,7 +510,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="space-y-12">
-          {/* Section: Arrived in 2026 */}
+          {/* Section: Arrived in 2027 */}
           {arrivedCountries.length > 0 && (
             <motion.section 
               initial={{ opacity: 0 }}

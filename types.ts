@@ -13,9 +13,9 @@ export interface TransitionStatus {
   zone: string;
   country: string;
   code: string;
-  isIn2026: boolean;
+  isIn2027: boolean;
   localTime: string;
-  timeTo2026: number; // in milliseconds (negative if already in 2026)
+  timeTo2027: number; // in milliseconds (negative if already in 2027)
   offset: number;
 }
 
@@ -29,7 +29,7 @@ export interface CelebrationInsight {
 export interface AppTranslations {
   appTitle: string;
   liveUpdates: string;
-  countriesIn2026: string;
+  countriesIn2027: string;
   heroTitle: string;
   heroSubtitle: string;
   globalTransition: string;

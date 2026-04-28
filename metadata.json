@@ -1,6 +1,6 @@
 {
-  "name": "2026 Global Tracker",
-  "description": "A real-time dashboard tracking the world's transition into the year 2026, featuring countdowns, status updates, and AI-powered cultural insights for every country.",
+  "name": "2027 Global Tracker",
+  "description": "A real-time dashboard tracking the world's transition into the year 2027, featuring countdowns, status updates, and AI-powered cultural insights for every country.",
   "requestFramePermissions": [
     "geolocation"
   ]

@@ -169,7 +169,7 @@ const Fireworks: React.FC = () => {
              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-yellow-200 to-amber-500 drop-shadow-[0_0_35px_rgba(251,191,36,0.8)] tracking-tighter leading-none">
                 HAPPY<br/>NEW YEAR
             </h1>
-             <p className="text-4xl md:text-6xl font-black text-white mt-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] tracking-[0.2em]">2026</p>
+             <p className="text-4xl md:text-6xl font-black text-white mt-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] tracking-[0.2em]">2027</p>
         </div>
     </div>
   );

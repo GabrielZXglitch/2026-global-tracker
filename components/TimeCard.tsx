@@ -16,7 +16,7 @@ interface TimeCardProps {
 }
 
 const formatRemainingCompact = (ms: number, dayLabel: string) => {
-  if (ms <= 0) return "IN 2026!";
+  if (ms <= 0) return "IN 2027!";
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
   const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
@@ -41,7 +41,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
   if (datePart.startsWith(',')) datePart = datePart.slice(1).trim();
 
   const isList = variant === 'list';
-  const remainingText = formatRemainingCompact(status.timeTo2026, t.dayShort);
+  const remainingText = formatRemainingCompact(status.timeTo2027, t.dayShort);
   const isDark = theme === 'dark';
 
   const handleCalendarClick = (e: React.MouseEvent) => {
@@ -64,7 +64,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
         whileHover={{ scale: 1.02 }}
         onClick={() => onClick(status.country)}
         className={`relative overflow-hidden cursor-pointer transition-all duration-300 p-3 rounded-lg border flex items-center justify-between gap-4 backdrop-blur-xl hover:shadow-lg ${
-          status.isIn2026 
+          status.isIn2027 
             ? (isDark ? 'bg-emerald-950/30 border-emerald-500/30 hover:bg-emerald-900/40' : 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100')
             : (isNext 
                 ? (isDark ? 'bg-blue-900/30 border-blue-400/60 ring-1 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.25)]' : 'bg-white border-blue-300 ring-1 ring-blue-200 shadow-sm')
@@ -87,7 +87,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
                 {status.country}
                 {isNext && <span className="ml-2 inline-flex items-center rounded-full bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-500 ring-1 ring-inset ring-blue-500/20">NEXT</span>}
               </h3>
-              {status.isIn2026 ? (
+              {status.isIn2027 ? (
                 <CheckCircle2 className="text-emerald-500 w-4 h-4 animate-pulse md:hidden" />
               ) : (
                 <Timer className={`w-4 h-4 md:hidden ${isNext ? 'text-blue-400' : 'text-blue-500'}`} />
@@ -154,16 +154,16 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
           {/* Countdown/Status */}
           <div className="text-right min-w-[80px]">
              <div className="flex items-center justify-end gap-2 mb-0.5">
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${status.isIn2026 ? 'text-emerald-500' : (isDark ? 'text-slate-500' : 'text-slate-500')}`}>
-                  {status.isIn2026 ? t.cardLive : t.cardToGo}
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${status.isIn2027 ? 'text-emerald-500' : (isDark ? 'text-slate-500' : 'text-slate-500')}`}>
+                  {status.isIn2027 ? t.cardLive : t.cardToGo}
                 </span>
-                {status.isIn2026 ? (
+                {status.isIn2027 ? (
                   <CheckCircle2 className="text-emerald-500 w-3 h-3 hidden md:block" />
                 ) : (
                   <Timer className={`w-3 h-3 hidden md:block ${isNext ? 'text-blue-400' : 'text-blue-500'}`} />
                 )}
              </div>
-             <p key={remainingText} className={`text-sm font-mono font-bold tracking-tight tabular-nums animate-slide-up ${status.isIn2026 ? 'text-emerald-500' : (isNext ? 'text-blue-400' : 'text-blue-500')}`}>
+             <p key={remainingText} className={`text-sm font-mono font-bold tracking-tight tabular-nums animate-slide-up ${status.isIn2027 ? 'text-emerald-500' : (isNext ? 'text-blue-400' : 'text-blue-500')}`}>
                 {remainingText}
              </p>
           </div>
@@ -181,7 +181,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
       whileHover={{ scale: 1.02 }}
       onClick={() => onClick(status.country)}
       className={`relative overflow-hidden cursor-pointer transition-all duration-300 p-4 rounded-xl border backdrop-blur-xl hover:shadow-xl ${
-        status.isIn2026 
+        status.isIn2027 
           ? (isDark ? 'bg-emerald-950/30 border-emerald-500/40 hover:bg-emerald-900/40 shadow-[0_4px_20px_rgba(16,185,129,0.1)]' : 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100 shadow-sm') 
           : (isNext
               ? (isDark ? 'bg-blue-900/30 border-blue-400 ring-1 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.25)] hover:bg-blue-900/40' : 'bg-white border-blue-300 ring-1 ring-blue-200 shadow-sm hover:bg-slate-50')
@@ -231,7 +231,7 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
              <Info size={16} />
            </button>
 
-           {status.isIn2026 ? (
+           {status.isIn2027 ? (
              <CheckCircle2 className="text-emerald-500 w-5 h-5 flex-shrink-0 animate-pulse ml-1" />
            ) : (
              <Timer className={`w-5 h-5 flex-shrink-0 ml-1 ${isNext ? 'text-blue-400 animate-pulse' : 'text-blue-500'}`} />
@@ -261,17 +261,17 @@ const TimeCard: React.FC<TimeCardProps> = ({ status, onClick, isSelected, isNext
         </div>
         
         <div className="flex flex-col justify-center text-right">
-          <p className={`text-[10px] uppercase tracking-wider font-bold mb-0.5 ${status.isIn2026 ? 'text-emerald-500' : 'text-slate-500'}`}>
-            {status.isIn2026 ? t.cardStatus : t.cardCountdown}
+          <p className={`text-[10px] uppercase tracking-wider font-bold mb-0.5 ${status.isIn2027 ? 'text-emerald-500' : 'text-slate-500'}`}>
+            {status.isIn2027 ? t.cardStatus : t.cardCountdown}
           </p>
-          <p key={remainingText} className={`text-sm font-mono font-bold tracking-tight tabular-nums animate-slide-up ${status.isIn2026 ? 'text-emerald-500' : (isNext ? 'text-blue-400' : 'text-blue-500')}`}>
+          <p key={remainingText} className={`text-sm font-mono font-bold tracking-tight tabular-nums animate-slide-up ${status.isIn2027 ? 'text-emerald-500' : (isNext ? 'text-blue-400' : 'text-blue-500')}`}>
             {remainingText}
           </p>
         </div>
       </div>
       
       {/* Background decoration */}
-      <div className={`absolute -bottom-6 -right-6 w-20 h-20 rounded-full opacity-5 blur-xl transition-opacity duration-500 group-hover:opacity-10 ${status.isIn2026 ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>
+      <div className={`absolute -bottom-6 -right-6 w-20 h-20 rounded-full opacity-5 blur-xl transition-opacity duration-500 group-hover:opacity-10 ${status.isIn2027 ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>
     </motion.div>
   );
 };

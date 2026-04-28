@@ -3,7 +3,7 @@ import { TransitionStatus } from '../types';
 import { TARGET_DATE_UTC } from '../constants';
 
 export const downloadCalendarEvent = (status: TransitionStatus) => {
-  // Calculate the specific UTC time when this country hits 2026
+  // Calculate the specific UTC time when this country hits 2027
   // Formula: Target (UTC Jan 1 00:00) - Offset (in ms)
   // Example: Kiribati (UTC+14) hits it 14 hours BEFORE UTC.
   const arrivalTime = TARGET_DATE_UTC - (status.offset * 60 * 1000);
@@ -19,16 +19,16 @@ export const downloadCalendarEvent = (status: TransitionStatus) => {
 
   const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Global Horizons//2026 Tracker//EN
+PRODID:-//Global Horizons//2027 Tracker//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-UID:${Date.now()}@2026tracker.app
+UID:${Date.now()}@2027tracker.app
 DTSTAMP:${formatDate(now)}
 DTSTART:${formatDate(startDate)}
 DTEND:${formatDate(endDate)}
-SUMMARY:New Year 2026 in ${status.country}
-DESCRIPTION:Celebrate the arrival of 2026 in ${status.country}! (Timezone: ${status.zone})
+SUMMARY:New Year 2027 in ${status.country}
+DESCRIPTION:Celebrate the arrival of 2027 in ${status.country}! (Timezone: ${status.zone})
 LOCATION:${status.country}
 STATUS:CONFIRMED
 SEQUENCE:0
@@ -39,7 +39,7 @@ END:VCALENDAR`;
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', `new_year_2026_${status.country.replace(/\s+/g, '_').toLowerCase()}.ics`);
+  link.setAttribute('download', `new_year_2027_${status.country.replace(/\s+/g, '_').toLowerCase()}.ics`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
